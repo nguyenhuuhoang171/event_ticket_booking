@@ -1,0 +1,26 @@
+{
+  "Server": {
+    "Port": "8080"
+  },
+  "Cookie": {
+    "Secure": true
+  },
+  "Db": {
+    "Username": "root",
+    "Password": "root",
+    "Host": "127.0.0.1",
+    "Port": "3306",
+    "DbName": "event_ticket_booking"
+  },
+  "Authentication": {
+    "RefreshTokenExpirationDays": 7,
+    "AccessTokenExpirationMinutes": 5
+  },
+  "Redis": {
+    "Host": "127.0.0.1",
+    "Port": "6379",
+    "Username": "",
+    "Password": "",
+    "Db": 0
+  }
+}
