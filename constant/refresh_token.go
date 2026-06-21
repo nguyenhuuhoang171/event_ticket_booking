@@ -1,6 +1,0 @@
-package constant
-
-const (
-	REFRESH_TOKEN_STATUS_ACTIVE  = 1
-	REFRESH_TOKEN_STATUS_REVOKED = 0
-)

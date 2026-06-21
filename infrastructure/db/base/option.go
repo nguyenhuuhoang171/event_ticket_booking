@@ -66,7 +66,7 @@ func WithPreload(association string, args ...any) QueryOption {
 // WithJoin adds a raw SQL JOIN. Use it to filter the main entity by a related
 // table's columns, e.g.
 //
-//	WithJoin("JOIN refresh_token rt ON rt.user_id = user.id AND rt.status = ?", 1)
+//	WithJoin("JOIN `order` o ON o.user_id = user.id AND o.status = ?", "paid")
 func WithJoin(query string, args ...any) QueryOption {
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Joins(query, args...)

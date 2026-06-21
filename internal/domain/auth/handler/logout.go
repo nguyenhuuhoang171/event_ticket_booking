@@ -15,7 +15,7 @@ func (h *Handler) Logout(c *gin.Context) {
 	// parse request
 	var request dto.LogoutRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
-		util.WriteError(c, commonModel.NewError(http.StatusBadRequest, err.Error()))
+		util.WriteError(c, commonModel.NewError(http.StatusBadRequest, util.ValidationMessage(err)))
 		return
 	}
 

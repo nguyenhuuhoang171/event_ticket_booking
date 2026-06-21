@@ -15,7 +15,6 @@ import (
 /*
 1. Authenticate user + password
 2. Create access token
-3. Create refresh token + save to database
 */
 func (u Usecase) Login(ctx context.Context, request dto.LoginRequest) (*dto.LoginResponse, error) {
 	prefixLog := util.GetFunctionName(0)
@@ -39,12 +38,6 @@ func (u Usecase) Login(ctx context.Context, request dto.LoginRequest) (*dto.Logi
 	accessToken, err := u.generateAccessToken(user)
 	if err != nil {
 		log.Printf("%s Generating access token: %v", prefixLog, err)
-		return nil, commonModel.NewError(http.StatusInternalServerError, constant.INTERNAL_SERVER_ERROR)
-	}
-
-	// 3. Create refresh token + save to database
-	if _, err := u.saveRefreshToken(ctx, user.Id); err != nil {
-		log.Printf("%s Saving refresh token: %v", prefixLog, err)
 		return nil, commonModel.NewError(http.StatusInternalServerError, constant.INTERNAL_SERVER_ERROR)
 	}
 

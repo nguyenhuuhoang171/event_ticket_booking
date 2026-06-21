@@ -6,9 +6,6 @@ import (
 	"time"
 
 	"event_ticket_booking/config"
-	refreshTokenEntity "event_ticket_booking/infrastructure/db/refresh_token/entity"
-	refreshTokenRepo "event_ticket_booking/infrastructure/db/refresh_token/repository"
-	userEntity "event_ticket_booking/infrastructure/db/user/entity"
 	userRepo "event_ticket_booking/infrastructure/db/user/repository"
 
 	"gorm.io/driver/mysql"
@@ -17,21 +14,14 @@ import (
 )
 
 type Db struct {
-	UserRepo         userRepo.IRepository
-	RefreshTokenRepo refreshTokenRepo.IRepository
+	UserRepo userRepo.IRepository
 }
 
 func NewDb(config config.Config) Db {
 	db := NewDbConnection(config.Db)
 
-	// Auto-migrate the auth tables so the service is runnable out of the box.
-	if err := db.AutoMigrate(&userEntity.Entity{}, &refreshTokenEntity.Entity{}); err != nil {
-		panic(fmt.Sprintf("failed to auto-migrate database: %v", err))
-	}
-
 	return Db{
-		UserRepo:         userRepo.NewRepository(db),
-		RefreshTokenRepo: refreshTokenRepo.NewRepository(db),
+		UserRepo: userRepo.NewRepository(db),
 	}
 }
 

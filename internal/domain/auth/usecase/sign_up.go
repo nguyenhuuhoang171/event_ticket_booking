@@ -18,14 +18,16 @@ import (
 3. Hash password
 4. Create user
 5. Create access token
-6. Create refresh token + save to database
 */
 func (u Usecase) SignUp(ctx context.Context, request dto.SignupRequest) (*dto.SignupResponse, error) {
 	prefixLog := util.GetFunctionName(0)
 
 	// 1. Validate email + password
-	if !isValidEmail(request.Email) || !isValidPassword(request.Password) {
-		return nil, commonModel.NewError(http.StatusBadRequest, "Email or password is invalid")
+	if !isValidEmail(request.Email) {
+		return nil, commonModel.NewError(http.StatusBadRequest, "Email is invalid")
+	}
+	if !isValidPassword(request.Password) {
+		return nil, commonModel.NewError(http.StatusBadRequest, "Password s invalid")
 	}
 
 	// 2. Check if email already exists
@@ -62,12 +64,6 @@ func (u Usecase) SignUp(ctx context.Context, request dto.SignupRequest) (*dto.Si
 	accessToken, err := u.generateAccessToken(createdUser)
 	if err != nil {
 		log.Printf("%s Generating access token: %v", prefixLog, err)
-		return nil, commonModel.NewError(http.StatusInternalServerError, constant.INTERNAL_SERVER_ERROR)
-	}
-
-	// 6. Create refresh token + save to database
-	if _, err := u.saveRefreshToken(ctx, createdUser.Id); err != nil {
-		log.Printf("%s Creating refresh token: %v", prefixLog, err)
 		return nil, commonModel.NewError(http.StatusInternalServerError, constant.INTERNAL_SERVER_ERROR)
 	}
 

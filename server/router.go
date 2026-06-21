@@ -39,7 +39,6 @@ func setDomainRoute(router *gin.Engine, cfg config.Config, lib commonModel.Lib) 
 	router.POST("/signup", initAuthHandler.Signup)
 	router.POST("/login", initAuthHandler.Login)
 	router.POST("/logout", initAuthHandler.Logout)
-	router.POST("/refresh-token", initAuthHandler.RefreshToken)
 }
 
 func configureTrustedProxies(router *gin.Engine) {

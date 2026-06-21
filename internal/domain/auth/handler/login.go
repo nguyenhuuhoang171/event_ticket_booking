@@ -15,7 +15,7 @@ func (h *Handler) Login(c *gin.Context) {
 	// parse request
 	var request dto.LoginRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
-		util.WriteError(c, commonModel.NewError(http.StatusBadRequest, err.Error()))
+		util.WriteError(c, commonModel.NewError(http.StatusBadRequest, util.ValidationMessage(err)))
 		return
 	}
 

@@ -28,7 +28,6 @@ type DbConfig struct {
 }
 
 type AuthenticationConfig struct {
-	RefreshTokenExpirationDays   int // days
 	AccessTokenExpirationMinutes int // minutes
 }
 

@@ -7,14 +7,13 @@
   },
   "Db": {
     "Username": "root",
-    "Password": "root",
+    "Password": "rootlocal123",
     "Host": "127.0.0.1",
     "Port": "3306",
     "DbName": "event_ticket_booking"
   },
   "Authentication": {
-    "RefreshTokenExpirationDays": 7,
-    "AccessTokenExpirationMinutes": 5
+    "AccessTokenExpirationMinutes": 1440
   },
   "Redis": {
     "Host": "127.0.0.1",
