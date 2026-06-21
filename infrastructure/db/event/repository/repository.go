@@ -11,16 +11,16 @@ import (
 )
 
 type Repo struct {
-	*base.Repository[entity.Entity, entity.Filter]
+	*base.Repository[entity.Entity, Filter]
 }
 
 func NewRepository(db *gorm.DB) IRepository {
 	return &Repo{
-		Repository: base.NewRepository[entity.Entity, entity.Filter](db),
+		Repository: base.NewRepository[entity.Entity, Filter](db),
 	}
 }
 
-func (r *Repo) GetList(ctx context.Context, filter entity.Filter, page, size int) ([]entity.Entity, int64, error) {
+func (r *Repo) GetList(ctx context.Context, filter Filter, page, size int) ([]entity.Entity, int64, error) {
 	var total int64
 	countQuery := filter.Apply(r.WithContext(ctx).Model(&entity.Entity{}))
 	if err := countQuery.Count(&total).Error; err != nil {

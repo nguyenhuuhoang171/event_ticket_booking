@@ -14,6 +14,7 @@ type Entity struct {
 	Description  string         `gorm:"column:description"`
 	DateTime     time.Time      `gorm:"column:date_time"`
 	TotalTickets uint64         `gorm:"column:total_tickets"`
+	SoldTickets  uint64         `gorm:"column:sold_tickets"`
 	TicketPrice  uint64         `gorm:"column:ticket_price"`
 	Status       int            `gorm:"column:status"`
 	CreatedAt    time.Time      `gorm:"column:created_at;autoCreateTime"`
@@ -38,28 +39,4 @@ func (e *Entity) BeforeDelete(tx *gorm.DB) error {
 			"deleted_by": e.DeletedBy,
 			"status":     constant.EVENT_STATUS_DELETED,
 		}).Error
-}
-
-type Filter struct {
-	Id       uint64
-	Name     string
-	DateTime string
-	Status   int
-}
-
-func (f Filter) Apply(query *gorm.DB) *gorm.DB {
-	table := Entity{}.TableName()
-	if f.Id != 0 {
-		query = query.Where(table+".id = ?", f.Id)
-	}
-	if f.Name != "" {
-		query = query.Where(table+".name = ?", f.Name)
-	}
-	if f.DateTime != "" {
-		query = query.Where(table+".date_time = ?", f.DateTime)
-	}
-	if f.Status != 0 {
-		query = query.Where(table+".status = ?", f.Status)
-	}
-	return query
 }

@@ -8,6 +8,6 @@ import (
 )
 
 type IRepository interface {
-	base.IRepository[entity.Entity, entity.Filter]
-	GetList(ctx context.Context, filter entity.Filter, page, size int) ([]entity.Entity, int64, error)
+	base.IRepository[entity.Entity, Filter]
+	GetList(ctx context.Context, filter Filter, page, size int) ([]entity.Entity, int64, error)
 }

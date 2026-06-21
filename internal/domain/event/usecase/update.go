@@ -7,6 +7,7 @@ import (
 
 	"event_ticket_booking/constant"
 	eventEntity "event_ticket_booking/infrastructure/db/event/entity"
+	eventRepo "event_ticket_booking/infrastructure/db/event/repository"
 	"event_ticket_booking/internal/domain/event/dto"
 	commonModel "event_ticket_booking/model"
 )
@@ -18,7 +19,7 @@ import (
 */
 func (u Usecase) Update(ctx context.Context, userId, id uint64, request dto.UpdateEventRequest) (*dto.UpdateResponse, error) {
 	// 1. Check the event exists
-	event, err := u.eventRepo.GetOne(ctx, eventEntity.Filter{
+	event, err := u.eventRepo.GetOne(ctx, eventRepo.Filter{
 		Id:     id,
 		Status: constant.EVENT_STATUS_ACTIVE,
 	})

@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"event_ticket_booking/constant"
-	userEntity "event_ticket_booking/infrastructure/db/user/entity"
+	userRepo "event_ticket_booking/infrastructure/db/user/repository"
 	"event_ticket_booking/internal/domain/auth/dto"
 	commonModel "event_ticket_booking/model"
 	"event_ticket_booking/util"
@@ -20,7 +20,7 @@ func (u Usecase) Login(ctx context.Context, request dto.LoginRequest) (*dto.Logi
 	prefixLog := util.GetFunctionName(0)
 
 	// 1. Authenticate user + password
-	user, err := u.userRepo.GetOne(ctx, userEntity.Filter{
+	user, err := u.userRepo.GetOne(ctx, userRepo.Filter{
 		Email: request.Email,
 	})
 	if err != nil {

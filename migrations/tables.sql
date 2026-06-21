@@ -20,6 +20,7 @@ CREATE TABLE `event_ticket_booking`.`event` (
     `description`   TEXT             NULL,
     `date_time`     DATETIME         NOT NULL,
     `total_tickets` BIGINT UNSIGNED  NOT NULL DEFAULT 0,
+    `sold_tickets`  BIGINT UNSIGNED  NOT NULL DEFAULT 0,
     `ticket_price`  BIGINT UNSIGNED  NOT NULL DEFAULT 0,
     `status`        TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '1 = active, 2 = deleted',
     `created_at`    DATETIME         NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -30,4 +31,20 @@ CREATE TABLE `event_ticket_booking`.`event` (
     `deleted_by`    BIGINT UNSIGNED  NULL DEFAULT NULL,
     PRIMARY KEY (`id`),
     KEY `idx_event_date_time` (`date_time`)
+);
+
+-- Table booking
+CREATE TABLE `event_ticket_booking`.`booking` (
+    `id`         BIGINT UNSIGNED  NOT NULL AUTO_INCREMENT,
+    `event_id`   BIGINT UNSIGNED  NOT NULL,
+    `user_id`    BIGINT UNSIGNED  NOT NULL,
+    `quantity`   BIGINT UNSIGNED  NOT NULL DEFAULT 0,
+    `status`     TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '1 = pending, 2 = confirmed, 3 = cancelled',
+    `created_at` DATETIME         NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `created_by` BIGINT UNSIGNED  NOT NULL,
+    `updated_at` DATETIME         NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `updated_by` BIGINT UNSIGNED  NOT NULL,
+    PRIMARY KEY (`id`),
+    KEY `idx_booking_event_id` (`event_id`),
+    KEY `idx_booking_user_id` (`user_id`)
 );

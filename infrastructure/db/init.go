@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"event_ticket_booking/config"
+	bookingRepo "event_ticket_booking/infrastructure/db/booking/repository"
 	eventRepo "event_ticket_booking/infrastructure/db/event/repository"
 	userRepo "event_ticket_booking/infrastructure/db/user/repository"
 
@@ -15,16 +16,18 @@ import (
 )
 
 type Db struct {
-	UserRepo  userRepo.IRepository
-	EventRepo eventRepo.IRepository
+	UserRepo    userRepo.IRepository
+	EventRepo   eventRepo.IRepository
+	BookingRepo bookingRepo.IRepository
 }
 
 func NewDb(config config.Config) Db {
 	db := NewDbConnection(config.Db)
 
 	return Db{
-		UserRepo:  userRepo.NewRepository(db),
-		EventRepo: eventRepo.NewRepository(db),
+		UserRepo:    userRepo.NewRepository(db),
+		EventRepo:   eventRepo.NewRepository(db),
+		BookingRepo: bookingRepo.NewRepository(db),
 	}
 }
 

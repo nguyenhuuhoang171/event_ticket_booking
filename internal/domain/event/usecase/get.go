@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"event_ticket_booking/constant"
-	eventEntity "event_ticket_booking/infrastructure/db/event/entity"
+	eventRepo "event_ticket_booking/infrastructure/db/event/repository"
 	"event_ticket_booking/internal/domain/event/dto"
 	commonModel "event_ticket_booking/model"
 	"event_ticket_booking/util"
@@ -15,7 +15,7 @@ import (
 func (u Usecase) GetByID(ctx context.Context, id uint64) (*dto.EventResponse, error) {
 	prefixLog := util.GetFunctionName(0)
 
-	event, err := u.eventRepo.GetOne(ctx, eventEntity.Filter{
+	event, err := u.eventRepo.GetOne(ctx, eventRepo.Filter{
 		Id:     id,
 		Status: constant.EVENT_STATUS_ACTIVE,
 	})
@@ -34,7 +34,7 @@ func (u Usecase) GetByID(ctx context.Context, id uint64) (*dto.EventResponse, er
 func (u Usecase) List(ctx context.Context, request dto.ListEventRequest) (*dto.ListEventResponse, error) {
 	prefixLog := util.GetFunctionName(0)
 
-	items, total, err := u.eventRepo.GetList(ctx, eventEntity.Filter{Name: request.Name}, request.Page, request.Size)
+	items, total, err := u.eventRepo.GetList(ctx, eventRepo.Filter{Name: request.Name}, request.Page, request.Size)
 	if err != nil {
 		log.Printf("%s Listing events: %v", prefixLog, err)
 		return nil, commonModel.NewError(http.StatusInternalServerError, constant.INTERNAL_SERVER_ERROR)

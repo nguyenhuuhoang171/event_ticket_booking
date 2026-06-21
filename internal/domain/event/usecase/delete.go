@@ -6,6 +6,7 @@ import (
 
 	"event_ticket_booking/constant"
 	eventEntity "event_ticket_booking/infrastructure/db/event/entity"
+	eventRepo "event_ticket_booking/infrastructure/db/event/repository"
 	commonModel "event_ticket_booking/model"
 )
 
@@ -15,7 +16,7 @@ import (
 */
 func (u Usecase) Delete(ctx context.Context, userId, id uint64) error {
 	// 1. Check event exists
-	event, err := u.eventRepo.GetOne(ctx, eventEntity.Filter{
+	event, err := u.eventRepo.GetOne(ctx, eventRepo.Filter{
 		Id:     id,
 		Status: constant.EVENT_STATUS_ACTIVE,
 	})

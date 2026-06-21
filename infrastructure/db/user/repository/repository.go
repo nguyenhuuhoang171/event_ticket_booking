@@ -10,11 +10,11 @@ import (
 // Repo is the user repository. It inherits the generic CRUD methods from the
 // base repository.
 type Repo struct {
-	*base.Repository[entity.Entity, entity.Filter]
+	*base.Repository[entity.Entity, Filter]
 }
 
 func NewRepository(db *gorm.DB) IRepository {
 	return &Repo{
-		Repository: base.NewRepository[entity.Entity, entity.Filter](db),
+		Repository: base.NewRepository[entity.Entity, Filter](db),
 	}
 }

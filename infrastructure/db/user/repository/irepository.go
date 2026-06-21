@@ -8,5 +8,5 @@ import (
 // IRepository is the user repository contract: the generic CRUD set inherited
 // from base, plus any user-specific methods added below.
 type IRepository interface {
-	base.IRepository[entity.Entity, entity.Filter]
+	base.IRepository[entity.Entity, Filter]
 }

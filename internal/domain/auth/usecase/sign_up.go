@@ -7,6 +7,7 @@ import (
 
 	"event_ticket_booking/constant"
 	userEntity "event_ticket_booking/infrastructure/db/user/entity"
+	userRepo "event_ticket_booking/infrastructure/db/user/repository"
 	"event_ticket_booking/internal/domain/auth/dto"
 	commonModel "event_ticket_booking/model"
 	"event_ticket_booking/util"
@@ -31,7 +32,7 @@ func (u Usecase) SignUp(ctx context.Context, request dto.SignupRequest) (*dto.Si
 	}
 
 	// 2. Check if email already exists
-	user, err := u.userRepo.GetOne(ctx, userEntity.Filter{
+	user, err := u.userRepo.GetOne(ctx, userRepo.Filter{
 		Email: request.Email,
 	})
 	if err != nil {

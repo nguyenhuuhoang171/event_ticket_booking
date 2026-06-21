@@ -3,6 +3,7 @@ package server
 import (
 	"event_ticket_booking/config"
 	authHandler "event_ticket_booking/internal/domain/auth/handler"
+	bookingHandler "event_ticket_booking/internal/domain/booking/handler"
 	eventHandler "event_ticket_booking/internal/domain/event/handler"
 	"event_ticket_booking/internal/domain/ping"
 	"event_ticket_booking/middleware"
@@ -48,6 +49,14 @@ func setDomainRoute(router *gin.Engine, cfg config.Config, lib commonModel.Lib) 
 		eventGroup.GET("/:id", initEventHandler.GetByID)
 		eventGroup.PUT("/:id", initEventHandler.Update)
 		eventGroup.DELETE("/:id", initEventHandler.Delete)
+	}
+
+	// booking (requires authentication)
+	initBookingHandler := bookingHandler.NewHandler(cfg, lib)
+	bookingGroup := router.Group("/bookings", middleware.Authorize(cfg.Authentication.AccessSecret, lib.Redis))
+	{
+		bookingGroup.POST("", initBookingHandler.Create)
+		bookingGroup.POST("/:id/cancel", initBookingHandler.Cancel)
 	}
 }
 
