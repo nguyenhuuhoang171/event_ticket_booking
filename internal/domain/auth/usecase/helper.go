@@ -1,7 +1,6 @@
 package usecase
 
 import (
-	"os"
 	"regexp"
 	"time"
 
@@ -26,7 +25,7 @@ func verifyPassword(password, hashedPassword string) bool {
 }
 
 func (u Usecase) generateAccessToken(user *userEntity.Entity) (string, error) {
-	accessSecret := os.Getenv("ACCESS_SECRET")
+	accessSecret := u.cfg.Authentication.AccessSecret
 
 	claims := model.Claims{
 		UserId: user.Id,

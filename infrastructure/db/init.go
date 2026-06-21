@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"event_ticket_booking/config"
+	eventRepo "event_ticket_booking/infrastructure/db/event/repository"
 	userRepo "event_ticket_booking/infrastructure/db/user/repository"
 
 	"gorm.io/driver/mysql"
@@ -14,14 +15,16 @@ import (
 )
 
 type Db struct {
-	UserRepo userRepo.IRepository
+	UserRepo  userRepo.IRepository
+	EventRepo eventRepo.IRepository
 }
 
 func NewDb(config config.Config) Db {
 	db := NewDbConnection(config.Db)
 
 	return Db{
-		UserRepo: userRepo.NewRepository(db),
+		UserRepo:  userRepo.NewRepository(db),
+		EventRepo: eventRepo.NewRepository(db),
 	}
 }
 

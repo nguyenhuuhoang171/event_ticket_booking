@@ -16,7 +16,8 @@ type Config struct {
 }
 
 type ServerConfig struct {
-	Port string
+	Port           string
+	TrustedProxies []string
 }
 
 type DbConfig struct {
@@ -29,6 +30,7 @@ type DbConfig struct {
 
 type AuthenticationConfig struct {
 	AccessTokenExpirationMinutes int // minutes
+	AccessSecret                 string
 }
 
 type RedisConfig struct {

@@ -3,11 +3,10 @@ package server
 import (
 	"event_ticket_booking/config"
 	authHandler "event_ticket_booking/internal/domain/auth/handler"
+	eventHandler "event_ticket_booking/internal/domain/event/handler"
 	"event_ticket_booking/internal/domain/ping"
 	"event_ticket_booking/middleware"
 	commonModel "event_ticket_booking/model"
-	"os"
-	"strings"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -23,7 +22,7 @@ func NewRouter(cfg config.Config, lib commonModel.Lib) *gin.Engine {
 	router.Use(cors.Default())
 
 	// Configure trusted proxies
-	configureTrustedProxies(router)
+	configureTrustedProxies(router, cfg)
 
 	setDomainRoute(router, cfg, lib)
 
@@ -39,17 +38,22 @@ func setDomainRoute(router *gin.Engine, cfg config.Config, lib commonModel.Lib) 
 	router.POST("/signup", initAuthHandler.Signup)
 	router.POST("/login", initAuthHandler.Login)
 	router.POST("/logout", initAuthHandler.Logout)
+
+	// event (requires authentication)
+	initEventHandler := eventHandler.NewHandler(cfg, lib)
+	eventGroup := router.Group("/events", middleware.Authorize(cfg.Authentication.AccessSecret, lib.Redis))
+	{
+		eventGroup.POST("", initEventHandler.Create)
+		eventGroup.GET("", initEventHandler.List)
+		eventGroup.GET("/:id", initEventHandler.GetByID)
+		eventGroup.PUT("/:id", initEventHandler.Update)
+		eventGroup.DELETE("/:id", initEventHandler.Delete)
+	}
 }
 
-func configureTrustedProxies(router *gin.Engine) {
-	trustedProxies := os.Getenv("TRUSTED_PROXIES")
-
-	if trustedProxies != "" {
-		proxyList := strings.Split(trustedProxies, ",")
-		for i, proxy := range proxyList {
-			proxyList[i] = strings.TrimSpace(proxy)
-		}
-		router.SetTrustedProxies(proxyList)
+func configureTrustedProxies(router *gin.Engine, cfg config.Config) {
+	if len(cfg.Server.TrustedProxies) > 0 {
+		router.SetTrustedProxies(cfg.Server.TrustedProxies)
 	} else {
 		router.SetTrustedProxies([]string{
 			"127.0.0.1",      // localhost IPv4

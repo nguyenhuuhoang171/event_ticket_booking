@@ -4,7 +4,6 @@ import (
 	"context"
 	"log"
 	"net/http"
-	"os"
 	"time"
 
 	"event_ticket_booking/constant"
@@ -24,7 +23,7 @@ func (u Usecase) Logout(ctx context.Context, request dto.LogoutRequest) (*dto.Lo
 	prefixLog := util.GetFunctionName(0)
 
 	// 1. Validate access token
-	accessSecret := os.Getenv("ACCESS_SECRET")
+	accessSecret := u.cfg.Authentication.AccessSecret
 	_, err := jwt.ParseWithClaims(request.AccessToken, &model.Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(accessSecret), nil
 	})

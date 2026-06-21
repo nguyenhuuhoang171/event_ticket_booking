@@ -1,6 +1,7 @@
 {
   "Server": {
-    "Port": "8080"
+    "Port": "8080",
+    "TrustedProxies": ["127.0.0.1"]
   },
   "Cookie": {
     "Secure": true
@@ -13,7 +14,8 @@
     "DbName": "event_ticket_booking"
   },
   "Authentication": {
-    "AccessTokenExpirationMinutes": 1440
+    "AccessTokenExpirationMinutes": 1440,
+    "AccessSecret": "change-me-in-production"
   },
   "Redis": {
     "Host": "127.0.0.1",
