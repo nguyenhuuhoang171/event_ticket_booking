@@ -29,7 +29,7 @@ return -1
 1. Cancel booking + release tickets in DB
 2. Release tickets back to the Redis counter.
 */
-func (u Usecase) Cancel(ctx context.Context, userId, bookingId uint64) (*dto.BookingResponse, error) {
+func (u Usecase) Cancel(ctx context.Context, userId, bookingId uint64) (*dto.CancelResponse, error) {
 	prefixLog := util.GetFunctionName(0)
 
 	// 1. Cancel booking + release tickets in DB
@@ -52,6 +52,5 @@ func (u Usecase) Cancel(ctx context.Context, userId, bookingId uint64) (*dto.Boo
 		log.Printf("%s Releasing tickets to redis: %v", prefixLog, err)
 	}
 
-	res := dto.NewBookingResponse(cancelled)
-	return &res, nil
+	return &dto.CancelResponse{IsSuccess: true}, nil
 }

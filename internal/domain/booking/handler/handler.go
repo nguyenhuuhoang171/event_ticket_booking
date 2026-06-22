@@ -42,6 +42,22 @@ func (h *Handler) Create(c *gin.Context) {
 	c.JSON(http.StatusCreated, commonModel.Response{Data: res})
 }
 
+func (h *Handler) List(c *gin.Context) {
+	var request dto.ListBookingRequest
+	if err := c.ShouldBindQuery(&request); err != nil {
+		util.WriteError(c, commonModel.NewError(http.StatusBadRequest, util.ValidationMessage(err)))
+		return
+	}
+
+	res, err := h.usecase.List(c.Request.Context(), util.GetUserId(c), request)
+	if err != nil {
+		util.WriteError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, commonModel.Response{Data: res})
+}
+
 func (h *Handler) Cancel(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {

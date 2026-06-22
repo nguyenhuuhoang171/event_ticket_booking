@@ -15,6 +15,15 @@ type BookingResponse struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
+type ListBookingResponse struct {
+	Items []BookingResponse `json:"items"`
+	Total int64             `json:"total"`
+}
+
+type CancelResponse struct {
+	IsSuccess bool
+}
+
 func NewBookingResponse(e *bookingEntity.Entity) BookingResponse {
 	return BookingResponse{
 		Id:        e.Id,

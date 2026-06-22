@@ -37,7 +37,7 @@ return redis.call('DECRBY', KEYS[1], qty)
 1. Check event exists
 2. Reserve tickets atomically on Redis
 3. Create booking
-// 4. Roll back the Redis if transaction has error
+4. Roll back the Redis if transaction has error
 */
 func (u Usecase) Create(ctx context.Context, userId uint64, request dto.CreateBookingRequest) (*dto.BookingResponse, error) {
 	prefixLog := util.GetFunctionName(0)

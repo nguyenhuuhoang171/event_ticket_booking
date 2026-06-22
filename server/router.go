@@ -56,6 +56,7 @@ func setDomainRoute(router *gin.Engine, cfg config.Config, lib commonModel.Lib) 
 	bookingGroup := router.Group("/bookings", middleware.Authorize(cfg.Authentication.AccessSecret, lib.Redis))
 	{
 		bookingGroup.POST("", initBookingHandler.Create)
+		bookingGroup.GET("", initBookingHandler.List)
 		bookingGroup.POST("/:id/cancel", initBookingHandler.Cancel)
 	}
 }
