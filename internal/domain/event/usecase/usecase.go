@@ -4,6 +4,7 @@ import (
 	"context"
 	"event_ticket_booking/config"
 	"event_ticket_booking/constant"
+	bookingRepo "event_ticket_booking/infrastructure/db/booking/repository"
 	eventRepo "event_ticket_booking/infrastructure/db/event/repository"
 	commonModel "event_ticket_booking/model"
 	"fmt"
@@ -11,14 +12,16 @@ import (
 )
 
 type Usecase struct {
-	cfg       config.Config
-	eventRepo eventRepo.IRepository
+	cfg         config.Config
+	eventRepo   eventRepo.IRepository
+	bookingRepo bookingRepo.IRepository
 }
 
 func NewUsecase(cfg config.Config, lib commonModel.Lib) Usecase {
 	return Usecase{
-		cfg:       cfg,
-		eventRepo: lib.Db.EventRepo,
+		cfg:         cfg,
+		eventRepo:   lib.Db.EventRepo,
+		bookingRepo: lib.Db.BookingRepo,
 	}
 }
 

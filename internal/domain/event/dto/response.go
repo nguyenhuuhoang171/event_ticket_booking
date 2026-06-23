@@ -42,3 +42,9 @@ func NewEventResponse(e *eventEntity.Entity) EventResponse {
 type UpdateResponse struct {
 	IsSuccess bool
 }
+
+type StatsResponse struct {
+	EventId          uint64 `json:"event_id"`
+	TicketsSold      uint64 `json:"tickets_sold"`
+	EstimatedRevenue uint64 `json:"estimated_revenue"`
+}

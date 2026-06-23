@@ -14,6 +14,10 @@ type Entity struct {
 	CreatedBy uint64    `gorm:"column:created_by"`
 	UpdatedAt time.Time `gorm:"column:updated_at;autoUpdateTime"`
 	UpdatedBy uint64    `gorm:"column:updated_by"`
+
+	// Custom fields
+	TicketsSold      uint64 `gorm:"column:tickets_sold;->"`
+	EstimatedRevenue uint64 `gorm:"column:estimated_revenue;->"`
 }
 
 func (e Entity) TableName() string {

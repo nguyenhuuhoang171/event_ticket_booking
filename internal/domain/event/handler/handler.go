@@ -110,3 +110,19 @@ func (h *Handler) Delete(c *gin.Context) {
 
 	c.JSON(http.StatusOK, commonModel.Response{})
 }
+
+func (h *Handler) Stats(c *gin.Context) {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		util.WriteError(c, commonModel.NewError(http.StatusBadRequest, "Event id is invalid"))
+		return
+	}
+
+	res, err := h.usecase.GetStats(c.Request.Context(), id)
+	if err != nil {
+		util.WriteError(c, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, commonModel.Response{Data: res})
+}

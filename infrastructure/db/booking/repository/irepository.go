@@ -14,4 +14,5 @@ type IRepository interface {
 	Confirm(ctx context.Context, bookingId uint64) (*entity.Entity, error)
 	CancelBookings(ctx context.Context, bookingIds []uint64) ([]entity.Entity, error)
 	GetListPaging(ctx context.Context, filter Filter, page, size int64) ([]entity.Entity, int64, error)
+	GetStats(ctx context.Context, eventId uint64) (*entity.Entity, error)
 }
