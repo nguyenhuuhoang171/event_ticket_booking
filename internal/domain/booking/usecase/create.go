@@ -9,29 +9,15 @@ import (
 
 	"event_ticket_booking/constant"
 	bookingEntity "event_ticket_booking/infrastructure/db/booking/entity"
-	bookingRepo "event_ticket_booking/infrastructure/db/booking/repository"
 	eventRepo "event_ticket_booking/infrastructure/db/event/repository"
 	"event_ticket_booking/internal/domain/booking/dto"
+	bookingEvent "event_ticket_booking/internal/domain/booking/event"
 	commonModel "event_ticket_booking/model"
 	"event_ticket_booking/util"
 
+	"github.com/IBM/sarama"
 	"github.com/redis/go-redis/v9"
 )
-
-// KEYS[1] = remaining counter key
-// ARGV[1] = quantity
-// ARGV[2] = number of available tickets
-var reserveScript = redis.NewScript(`
-if redis.call('EXISTS', KEYS[1]) == 0 then
-	redis.call('SET', KEYS[1], ARGV[2])
-end
-local remaining = tonumber(redis.call('GET', KEYS[1]))
-local qty = tonumber(ARGV[1])
-if remaining < qty then
-	return -1
-end
-return redis.call('DECRBY', KEYS[1], qty)
-`)
 
 /*
 1. Check event exists
@@ -58,7 +44,7 @@ func (u Usecase) Create(ctx context.Context, userId uint64, request dto.CreateBo
 	// 2. Reserve tickets atomically on Redis
 	remainingKey := util.GetKeyRedis(constant.REDIS_KEY_EVENT_REMAINING, strconv.FormatUint(event.Id, 10))
 	available := event.TotalTickets - event.SoldTickets
-	reserved, err := reserveScript.Run(ctx, u.redis, []string{remainingKey}, request.Quantity, available).Int64()
+	reserved, err := redis.NewScript(constant.REDIS_SCRIPT_RESERVE_TICKETS).Run(ctx, u.redis, []string{remainingKey}, request.Quantity, available).Int64()
 	if err != nil {
 		log.Printf("%s Reserving tickets on redis: %v", prefixLog, err)
 		return nil, commonModel.NewError(http.StatusInternalServerError, constant.INTERNAL_SERVER_ERROR)
@@ -76,18 +62,35 @@ func (u Usecase) Create(ctx context.Context, userId uint64, request dto.CreateBo
 		CreatedBy: userId,
 		UpdatedBy: userId,
 	}
-	created, err := u.bookingRepo.Reserve(ctx, booking)
+	createRes, err := u.bookingRepo.Reserve(ctx, booking)
 	if err != nil {
 		// 4. Roll back the Redis if transaction has error
 		if rbErr := u.redis.IncrBy(ctx, remainingKey, int64(request.Quantity)).Err(); rbErr != nil {
 			log.Printf("%s Rolling back redis reservation: %v", prefixLog, rbErr)
 		}
-		if errors.Is(err, bookingRepo.ErrSoldOut) {
+		if errors.Is(err, constant.ErrSoldOut) {
 			return nil, commonModel.NewError(http.StatusConflict, "Không đủ vé")
 		}
 		return nil, commonModel.NewError(http.StatusInternalServerError, constant.INTERNAL_SERVER_ERROR)
 	}
 
-	res := dto.NewBookingResponse(created)
+	// 5. Payment
+	u.publishPaymentRequest(createRes.Id)
+
+	res := dto.NewBookingResponse(createRes)
 	return &res, nil
+}
+
+// bắn messsage kafka vào topic xử lý payment
+func (u Usecase) publishPaymentRequest(bookingId uint64) error {
+	message, err := bookingEvent.PaymentMessage{BookingID: bookingId}.Marshal()
+	if err != nil {
+		return err
+	}
+
+	_, _, err = u.kafka.SendMessage(&sarama.ProducerMessage{
+		Topic: constant.TOPIC_PAYMENT_REQUEST,
+		Value: sarama.ByteEncoder(message),
+	})
+	return err
 }

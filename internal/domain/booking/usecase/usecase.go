@@ -6,6 +6,7 @@ import (
 	eventRepo "event_ticket_booking/infrastructure/db/event/repository"
 	commonModel "event_ticket_booking/model"
 
+	"github.com/IBM/sarama"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -14,6 +15,7 @@ type Usecase struct {
 	bookingRepo bookingRepo.IRepository
 	eventRepo   eventRepo.IRepository
 	redis       *redis.Client
+	kafka       sarama.SyncProducer
 }
 
 func NewUsecase(cfg config.Config, lib commonModel.Lib) Usecase {
@@ -22,5 +24,6 @@ func NewUsecase(cfg config.Config, lib commonModel.Lib) Usecase {
 		bookingRepo: lib.Db.BookingRepo,
 		eventRepo:   lib.Db.EventRepo,
 		redis:       lib.Redis,
+		kafka:       lib.KafkaProducer,
 	}
 }

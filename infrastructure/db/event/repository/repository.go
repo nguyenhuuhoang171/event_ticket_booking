@@ -20,7 +20,7 @@ func NewRepository(db *gorm.DB) IRepository {
 	}
 }
 
-func (r *Repo) GetList(ctx context.Context, filter Filter, page, size int) ([]entity.Entity, int64, error) {
+func (r *Repo) GetListPaging(ctx context.Context, filter Filter, page, size int) ([]entity.Entity, int64, error) {
 	var total int64
 	countQuery := filter.Apply(r.WithContext(ctx).Model(&entity.Entity{}))
 	if err := countQuery.Count(&total).Error; err != nil {
@@ -28,7 +28,7 @@ func (r *Repo) GetList(ctx context.Context, filter Filter, page, size int) ([]en
 	}
 
 	if size <= 0 {
-		size = constant.DEFAULT_PAGE_SIZE
+		size = constant.DEFAULT_SIZE
 	}
 	if page < 1 {
 		page = 1

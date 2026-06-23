@@ -23,5 +23,22 @@
     "Username": "",
     "Password": "",
     "Db": 0
+  },
+  "Kafka": {
+    "Brokers": ["127.0.0.1:9092"],
+    "Consumer": {
+      "RetryMax": 3,
+      "RetryBackoffMs": 100
+    }
+  },
+  "Payment": {
+    "TimeoutMinutes": 15,
+    "SimulateFailureRate": 0
+  },
+  "Cron": {
+    "CancelExpiredBookingJob": {
+      "Enable": false,
+      "Spec": "*/1 * * * *"
+    }
   }
 }

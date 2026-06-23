@@ -9,5 +9,5 @@ import (
 
 type IRepository interface {
 	base.IRepository[entity.Entity, Filter]
-	GetList(ctx context.Context, filter Filter, page, size int) ([]entity.Entity, int64, error)
+	GetListPaging(ctx context.Context, filter Filter, page, size int) ([]entity.Entity, int64, error)
 }

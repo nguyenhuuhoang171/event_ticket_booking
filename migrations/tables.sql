@@ -48,3 +48,15 @@ CREATE TABLE `event_ticket_booking`.`booking` (
     KEY `idx_booking_event_id` (`event_id`),
     KEY `idx_booking_user_id` (`user_id`)
 );
+
+-- Table payment
+CREATE TABLE `event_ticket_booking`.`payment` (
+    `id`         BIGINT UNSIGNED  NOT NULL AUTO_INCREMENT,
+    `booking_id` BIGINT UNSIGNED  NOT NULL,
+    `amount`     BIGINT UNSIGNED  NOT NULL DEFAULT 0,
+    `status`     TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '1 = pending, 2 = success, 3 = failed',
+    `created_at` DATETIME         NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` DATETIME         NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_payment_booking` (`booking_id`)
+);

@@ -16,7 +16,7 @@ func (u Usecase) List(ctx context.Context, userId uint64, request dto.ListBookin
 		EventId: request.EventId,
 		Status:  request.Status,
 	}
-	items, total, err := u.bookingRepo.GetList(ctx, filter, request.Page, request.Size)
+	items, total, err := u.bookingRepo.GetListPaging(ctx, filter, int64(request.Page), int64(request.Size))
 	if err != nil {
 		return nil, commonModel.NewError(http.StatusInternalServerError, constant.INTERNAL_SERVER_ERROR)
 	}

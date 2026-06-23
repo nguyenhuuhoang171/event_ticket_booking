@@ -8,7 +8,6 @@ import (
 	"strconv"
 
 	"event_ticket_booking/constant"
-	bookingRepo "event_ticket_booking/infrastructure/db/booking/repository"
 	"event_ticket_booking/internal/domain/booking/dto"
 	commonModel "event_ticket_booking/model"
 	"event_ticket_booking/util"
@@ -36,9 +35,9 @@ func (u Usecase) Cancel(ctx context.Context, userId, bookingId uint64) (*dto.Can
 	cancelled, err := u.bookingRepo.Cancel(ctx, bookingId, userId)
 	if err != nil {
 		switch {
-		case errors.Is(err, bookingRepo.ErrBookingNotFound):
+		case errors.Is(err, constant.ErrBookingNotFound):
 			return nil, commonModel.NewError(http.StatusNotFound, "Không tìm thấy booking")
-		case errors.Is(err, bookingRepo.ErrAlreadyCancelled):
+		case errors.Is(err, constant.ErrAlreadyCancelled):
 			return nil, commonModel.NewError(http.StatusConflict, "Booking đã bị huỷ")
 		default:
 			log.Printf("%s Cancelling booking: %v", prefixLog, err)

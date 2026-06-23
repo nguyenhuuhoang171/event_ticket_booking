@@ -13,6 +13,9 @@ type Config struct {
 	Db             DbConfig
 	Authentication AuthenticationConfig
 	Redis          RedisConfig
+	Kafka          KafkaConfig
+	Payment        PaymentConfig
+	Cron           CronConfig
 }
 
 type ServerConfig struct {
@@ -39,6 +42,26 @@ type RedisConfig struct {
 	Username string
 	Password string
 	Db       int
+}
+
+type KafkaConfig struct {
+	Brokers  []string
+	Consumer struct {
+		RetryMax       int
+		RetryBackoffMs int
+	}
+}
+
+type PaymentConfig struct {
+	TimeoutMinutes      int
+	SimulateFailureRate int
+}
+
+type CronConfig struct {
+	CancelExpiredBookingJob struct {
+		Enable bool
+		Spec   string
+	}
 }
 
 func NewConfig() Config {

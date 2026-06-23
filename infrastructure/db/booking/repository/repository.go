@@ -10,12 +10,7 @@ import (
 	eventEntity "event_ticket_booking/infrastructure/db/event/entity"
 
 	"gorm.io/gorm"
-)
-
-var (
-	ErrSoldOut          = errors.New("event is sold out")
-	ErrBookingNotFound  = errors.New("booking not found")
-	ErrAlreadyCancelled = errors.New("booking already cancelled")
+	"gorm.io/gorm/clause"
 )
 
 type Repo struct {
@@ -28,7 +23,7 @@ func NewRepository(db *gorm.DB) IRepository {
 	}
 }
 
-func (r *Repo) GetList(ctx context.Context, filter Filter, page, size int) ([]entity.Entity, int64, error) {
+func (r *Repo) GetListPaging(ctx context.Context, filter Filter, page, size int64) ([]entity.Entity, int64, error) {
 	var total int64
 	countQuery := filter.Apply(r.WithContext(ctx).Model(&entity.Entity{}))
 	if err := countQuery.Count(&total).Error; err != nil {
@@ -36,7 +31,7 @@ func (r *Repo) GetList(ctx context.Context, filter Filter, page, size int) ([]en
 	}
 
 	if size <= 0 {
-		size = constant.DEFAULT_PAGE_SIZE
+		size = constant.DEFAULT_SIZE
 	}
 	if page < 1 {
 		page = 1
@@ -46,8 +41,8 @@ func (r *Repo) GetList(ctx context.Context, filter Filter, page, size int) ([]en
 	listQuery := filter.Apply(r.WithContext(ctx).Model(&entity.Entity{}))
 	if err := listQuery.
 		Order(entity.Entity{}.TableName() + ".id DESC").
-		Limit(size).
-		Offset((page - 1) * size).
+		Limit(int(size)).
+		Offset(int((page - 1) * size)).
 		Find(&items).Error; err != nil {
 		return nil, 0, err
 	}
@@ -66,7 +61,7 @@ func (r *Repo) Reserve(ctx context.Context, booking *entity.Entity) (*entity.Ent
 			return res.Error
 		}
 		if res.RowsAffected == 0 {
-			return ErrSoldOut
+			return constant.ErrSoldOut
 		}
 		return tx.Create(booking).Error
 	})
@@ -82,12 +77,12 @@ func (r *Repo) Cancel(ctx context.Context, bookingId, userId uint64) (*entity.En
 	err := r.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		if err := tx.Where("id = ? AND user_id = ?", bookingId, userId).First(&booking).Error; err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
-				return ErrBookingNotFound
+				return constant.ErrBookingNotFound
 			}
 			return err
 		}
 		if booking.Status == constant.BOOKING_STATUS_CANCELLED {
-			return ErrAlreadyCancelled
+			return constant.ErrAlreadyCancelled
 		}
 
 		res := tx.Model(&entity.Entity{}).
@@ -100,7 +95,7 @@ func (r *Repo) Cancel(ctx context.Context, bookingId, userId uint64) (*entity.En
 			return res.Error
 		}
 		if res.RowsAffected == 0 {
-			return ErrAlreadyCancelled
+			return constant.ErrAlreadyCancelled
 		}
 
 		if err := tx.Model(&eventEntity.Entity{}).
@@ -116,4 +111,99 @@ func (r *Repo) Cancel(ctx context.Context, bookingId, userId uint64) (*entity.En
 		return nil, err
 	}
 	return &booking, nil
+}
+
+// Confirm: chuyển booking PENDING sang CONFIRMED. Trả ErrNotPending nếu booking không còn PENDING.
+func (r *Repo) Confirm(ctx context.Context, bookingId uint64) (*entity.Entity, error) {
+	var booking entity.Entity
+	err := r.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		if err := tx.Where("id = ?", bookingId).First(&booking).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return constant.ErrBookingNotFound
+			}
+			return err
+		}
+		if booking.Status != constant.BOOKING_STATUS_PENDING {
+			return constant.ErrNotPending
+		}
+
+		res := tx.Model(&entity.Entity{}).
+			Where("id = ? AND status = ?", bookingId, constant.BOOKING_STATUS_PENDING).
+			Updates(map[string]any{
+				"status":     constant.BOOKING_STATUS_CONFIRMED,
+				"updated_by": constant.SYSTEM_USER_ID,
+			})
+		if res.Error != nil {
+			return res.Error
+		}
+		if res.RowsAffected == 0 {
+			return constant.ErrNotPending
+		}
+
+		booking.Status = constant.BOOKING_STATUS_CONFIRMED
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &booking, nil
+}
+
+// Cancel các booking PENDING (hết hạn thanh toán) + trả lại sold_tickets,
+// tất cả trong 1 transaction. Trả về đúng những booking thực sự bị huỷ (để caller trả vé Redis).
+// Dùng SELECT ... FOR UPDATE để khoá đúng tập PENDING, tránh huỷ nhầm booking vừa được CONFIRMED.
+func (r *Repo) CancelBookings(ctx context.Context, bookingIds []uint64) ([]entity.Entity, error) {
+	if len(bookingIds) == 0 {
+		return nil, nil
+	}
+
+	var cancelled []entity.Entity
+	err := r.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		// Khoá + lấy các booking còn PENDING trong danh sách
+		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).
+			Where("id IN ? AND status = ?", bookingIds, constant.BOOKING_STATUS_PENDING).
+			Find(&cancelled).Error; err != nil {
+			return err
+		}
+		if len(cancelled) == 0 {
+			return nil
+		}
+
+		ids := make([]uint64, len(cancelled))
+		for i := range cancelled {
+			ids[i] = cancelled[i].Id
+		}
+
+		// CancelMany
+		if err := tx.Model(&entity.Entity{}).
+			Where("id IN ?", ids).
+			Updates(map[string]any{
+				"status":     constant.BOOKING_STATUS_CANCELLED,
+				"updated_by": constant.SYSTEM_USER_ID,
+			}).Error; err != nil {
+			return err
+		}
+
+		// Trả lại sold_tickets, gộp theo event
+		eventQty := make(map[uint64]uint64)
+		for i := range cancelled {
+			eventQty[cancelled[i].EventId] += cancelled[i].Quantity
+		}
+		for eventId, qty := range eventQty {
+			if err := tx.Model(&eventEntity.Entity{}).
+				Where("id = ?", eventId).
+				UpdateColumn("sold_tickets", gorm.Expr("sold_tickets - ?", qty)).Error; err != nil {
+				return err
+			}
+		}
+
+		for i := range cancelled {
+			cancelled[i].Status = constant.BOOKING_STATUS_CANCELLED
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return cancelled, nil
 }

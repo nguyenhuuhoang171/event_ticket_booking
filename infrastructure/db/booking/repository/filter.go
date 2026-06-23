@@ -1,16 +1,19 @@
 package repository
 
 import (
+	"time"
+
 	"event_ticket_booking/infrastructure/db/booking/entity"
 
 	"gorm.io/gorm"
 )
 
 type Filter struct {
-	Id      uint64
-	EventId uint64
-	UserId  uint64
-	Status  int
+	Id          uint64
+	EventId     uint64
+	UserId      uint64
+	Status      int
+	ToCreatedAt time.Time
 }
 
 func (f Filter) Apply(query *gorm.DB) *gorm.DB {
@@ -26,6 +29,9 @@ func (f Filter) Apply(query *gorm.DB) *gorm.DB {
 	}
 	if f.Status != 0 {
 		query = query.Where(table+".status = ?", f.Status)
+	}
+	if !f.ToCreatedAt.IsZero() {
+		query = query.Where(table+".created_at <= ?", f.ToCreatedAt)
 	}
 	return query
 }
