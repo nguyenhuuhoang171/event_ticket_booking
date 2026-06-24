@@ -1,6 +1,6 @@
 {
   "Server": {
-    "Port": "8080",
+    "Port": "8081",
     "TrustedProxies": ["127.0.0.1"]
   },
   "Cookie": {
@@ -15,7 +15,7 @@
   },
   "Authentication": {
     "AccessTokenExpirationMinutes": 1440,
-    "AccessSecret": "change-me-in-production"
+    "AccessSecret": "abc"
   },
   "Redis": {
     "Host": "127.0.0.1",

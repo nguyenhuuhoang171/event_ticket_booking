@@ -13,6 +13,11 @@ CREATE TABLE `event_ticket_booking`.`user` (
     UNIQUE KEY `uk_user_email` (`email`)
 );
 
+-- Insert user
+INSERT INTO event_ticket_booking.`user`
+(id, email, name, hashed_password, `role`, created_at, created_by, updated_at, updated_by)
+VALUES(4, 'user@mail.com', '', '$2a$10$J.IW56JZLb75Zb98cppne.JAIXVK0jfoziJjo783lizK9JWv4vt/e', 'user', '2026-06-24 07:16:15', 0, '2026-06-24 07:16:15', 0);
+
 -- Table event
 CREATE TABLE `event_ticket_booking`.`event` (
     `id`            BIGINT UNSIGNED  NOT NULL AUTO_INCREMENT,
@@ -47,16 +52,4 @@ CREATE TABLE `event_ticket_booking`.`booking` (
     PRIMARY KEY (`id`),
     KEY `idx_booking_event_id` (`event_id`),
     KEY `idx_booking_user_id` (`user_id`)
-);
-
--- Table payment
-CREATE TABLE `event_ticket_booking`.`payment` (
-    `id`         BIGINT UNSIGNED  NOT NULL AUTO_INCREMENT,
-    `booking_id` BIGINT UNSIGNED  NOT NULL,
-    `amount`     BIGINT UNSIGNED  NOT NULL DEFAULT 0,
-    `status`     TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '1 = pending, 2 = success, 3 = failed',
-    `created_at` DATETIME         NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `updated_at` DATETIME         NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_payment_booking` (`booking_id`)
 );

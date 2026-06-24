@@ -1,7 +1,9 @@
 package consumer
 
 import (
+	"context"
 	"log"
+	"time"
 
 	"event_ticket_booking/config"
 	"event_ticket_booking/constant"
@@ -44,7 +46,9 @@ func (c paymentConsumer) ConsumeClaim(session sarama.ConsumerGroupSession, claim
 
 			kafkaCfg := c.processor.KafkaConfig()
 			err = withRetry(kafkaCfg, func() error {
-				return c.processor.ProcessPayment(session.Context(), msg.BookingID)
+				ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+				defer cancel()
+				return c.processor.ProcessPayment(ctx, msg.BookingID)
 			})
 			if err != nil {
 				log.Printf("[Consumer] ProcessPayment booking %d failed after %d retries: %v",
