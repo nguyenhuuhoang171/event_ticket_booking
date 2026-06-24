@@ -21,3 +21,7 @@ type ListEventRequest struct {
 	Page int    `form:"page"`
 	Size int    `form:"size"`
 }
+
+type StatsRequest struct {
+	EventId uint64 `form:"event_id"`
+}

@@ -227,7 +227,7 @@ func (r *Repo) GetStats(ctx context.Context, eventId uint64) ([]entity.Entity, e
 
 	var results []entity.Entity
 	err := query.
-		Group("e.id, e.ticket_price").
+		Group("e.id").
 		Order("e.id ASC").
 		Scan(&results).Error
 	if err != nil {

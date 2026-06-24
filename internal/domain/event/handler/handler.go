@@ -112,17 +112,13 @@ func (h *Handler) Delete(c *gin.Context) {
 }
 
 func (h *Handler) Stats(c *gin.Context) {
-	var eventId uint64
-	if raw := c.Query("event_id"); raw != "" {
-		id, err := strconv.ParseUint(raw, 10, 64)
-		if err != nil {
-			util.WriteError(c, commonModel.NewError(http.StatusBadRequest, "Event id is invalid"))
-			return
-		}
-		eventId = id
+	var request dto.StatsRequest
+	if err := c.ShouldBindQuery(&request); err != nil {
+		util.WriteError(c, commonModel.NewError(http.StatusBadRequest, util.ValidationMessage(err)))
+		return
 	}
 
-	res, err := h.usecase.GetStats(c.Request.Context(), eventId)
+	res, err := h.usecase.GetStats(c.Request.Context(), request.EventId)
 	if err != nil {
 		util.WriteError(c, err)
 		return
