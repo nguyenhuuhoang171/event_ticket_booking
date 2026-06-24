@@ -2,6 +2,7 @@ package cron
 
 import (
 	"context"
+	"log"
 	"reflect"
 
 	"event_ticket_booking/config"
@@ -31,6 +32,8 @@ func (j CancelExpiredBookingJob) Name() string { return reflect.TypeOf(j).Name()
 func (j CancelExpiredBookingJob) Spec() string { return j.spec }
 
 func (j CancelExpiredBookingJob) Run(ctx context.Context) error {
+	log.Printf("[Cron] %s started", j.Name())
+
 	for {
 		bookings, err := j.processor.GetExpiredPendingBookings(ctx)
 		if err != nil {

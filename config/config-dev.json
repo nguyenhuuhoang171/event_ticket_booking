@@ -37,7 +37,7 @@
   },
   "Cron": {
     "CancelExpiredBookingJob": {
-      "Enable": false,
+      "Enable": true,
       "Spec": "*/1 * * * *"
     }
   }
