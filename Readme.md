@@ -7,7 +7,7 @@ Auth REST API server written in Go.
 - Language: Go (1.25+)
 - Web framework: Gin
 - Database: MySQL (GORM)
-- Cache: Redis (access-token blacklist on logout)
+- Cache: Redis (access-token blacklist on logout, ticket reservation counter)
 - Message Queue: Kafka
 - Auth: JWT (access token)
 
@@ -24,22 +24,25 @@ Make sure the following are installed and running before you continue:
 
 ### Step 2 — Create the database & tables
 
-Run the schema file (creates the `event_ticket_booking` database and its tables):
+Create the database, then run the migration file in [`migrations/`](migrations/):
 
 ```bash
-mysql -u root -p < migrations/schema.sql
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS event_ticket_booking CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+mysql -u root -p event_ticket_booking < migrations/tables.sql
 ```
 
-> All SQL statements live in [migrations/schema.sql](migrations/schema.sql).
+> All SQL statements live in [`migrations/tables.sql`](migrations/tables.sql).
 > The app does not auto-migrate, so this step is required before the first run.
 
 ### Step 3 — Configure
 
-**`.env`** — environment variables:
+Copy `.env.example` to `.env` and set the environment:
 
 ```env
 ENVIRONMENT=dev
 ```
+
+Database and service settings are in [`config/config-dev.json`](config/config-dev.json). Update `Db.Username`, `Db.Password`, and other fields to match your local setup.
 
 ### Step 4 — Run the server
 
@@ -64,7 +67,7 @@ The server runs at `http://localhost:8080`.
 ### Step 6 — Verify
 
 ```bash
-curl http://localhost:8080/ping        # {"data":"pong"}
+curl http://localhost:8081/ping        # {"data":"pong"}
 ```
 
 ## 3. API Testing

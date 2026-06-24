@@ -59,7 +59,7 @@ func (m *mockBookingRepo) Confirm(ctx context.Context, bookingId uint64) (*booki
 func (m *mockBookingRepo) CancelBookings(ctx context.Context, bookingIds []uint64) ([]bookingEntity.Entity, error) {
 	return nil, nil
 }
-func (m *mockBookingRepo) GetStats(ctx context.Context, eventId uint64) (*bookingEntity.Entity, error) {
+func (m *mockBookingRepo) GetStats(ctx context.Context, eventId uint64) ([]bookingEntity.Entity, error) {
 	return nil, nil
 }
 

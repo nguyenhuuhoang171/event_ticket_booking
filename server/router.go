@@ -46,8 +46,8 @@ func setDomainRoute(router *gin.Engine, cfg config.Config, lib commonModel.Lib) 
 	{
 		eventGroup.POST("", initEventHandler.Create)
 		eventGroup.GET("", initEventHandler.List)
+		eventGroup.GET("/stats", initEventHandler.Stats)
 		eventGroup.GET("/:id", initEventHandler.GetByID)
-		eventGroup.GET("/:id/stats", initEventHandler.Stats)
 		eventGroup.PUT("/:id", initEventHandler.Update)
 		eventGroup.DELETE("/:id", initEventHandler.Delete)
 	}

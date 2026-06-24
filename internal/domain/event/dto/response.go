@@ -48,3 +48,8 @@ type StatsResponse struct {
 	TicketsSold      uint64 `json:"tickets_sold"`
 	EstimatedRevenue uint64 `json:"estimated_revenue"`
 }
+
+type ListStatsResponse struct {
+	Items []StatsResponse `json:"items"`
+	Total int64           `json:"total"`
+}

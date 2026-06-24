@@ -149,36 +149,14 @@
         },
         {
           "name": "Get List Event",
-          "protocolProfileBehavior": {
-            "disableBodyPruning": true
-          },
           "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo0LCJleHAiOjE3ODIzNDY1NzV9.AEMpmihv191ogWvq9CzvVbI2kDiH6nSyDgO9R4OPNEU",
-                  "type": "string"
-                }
-              ]
-            },
             "method": "GET",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
+                "key": "Authorization",
+                "value": "Bearer YOUR_ACCESS_TOKEN"
               }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
             "url": {
               "raw": "http://localhost:8081/events",
               "protocol": "http",
@@ -188,6 +166,23 @@
               "port": "8081",
               "path": [
                 "events"
+              ],
+              "query": [
+                {
+                  "key": "name",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "size",
+                  "value": "",
+                  "disabled": true
+                }
               ]
             }
           },
@@ -195,38 +190,16 @@
         },
         {
           "name": "Get Event By ID",
-          "protocolProfileBehavior": {
-            "disableBodyPruning": true
-          },
           "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJleHAiOjE3ODIwOTcyMjF9.YxWfT514IK_hCCnqmGRXAsdVaDPt4lJOA178psXPGU0",
-                  "type": "string"
-                }
-              ]
-            },
             "method": "GET",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
+                "key": "Authorization",
+                "value": "Bearer YOUR_ACCESS_TOKEN"
               }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"name\": \"Event 1\",\n    \"date_time\": \"2026-10-05 18:00:00\",\n    \"description\" :\"test\",\n    \"total_tickets\": 10,\n    \"ticket_price\": 10000\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
             "url": {
-              "raw": "http://localhost:8081/events/5",
+              "raw": "http://localhost:8081/events/1",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -234,7 +207,7 @@
               "port": "8081",
               "path": [
                 "events",
-                "5"
+                "1"
               ]
             }
           },
@@ -335,20 +308,26 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer eyJhbG..."
+                "value": "Bearer YOUR_ACCESS_TOKEN"
               }
             ],
             "url": {
-              "raw": "http://localhost:8080/events/1/stats",
+              "raw": "http://localhost:8081/events/stats",
               "protocol": "http",
               "host": [
                 "localhost"
               ],
-              "port": "8080",
+              "port": "8081",
               "path": [
                 "events",
-                "1",
                 "stats"
+              ],
+              "query": [
+                {
+                  "key": "event_id",
+                  "value": "",
+                  "disabled": true
+                }
               ]
             }
           },
@@ -404,36 +383,14 @@
         },
         {
           "name": "GetList",
-          "protocolProfileBehavior": {
-            "disableBodyPruning": true
-          },
           "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozLCJleHAiOjE3ODIyMjQ1NzN9.jHAM_bXUVH1vR6CFoeMKlTXSCn2_qRMF77nbuuri3k0",
-                  "type": "string"
-                }
-              ]
-            },
             "method": "GET",
             "header": [
               {
-                "key": "Content-Type",
-                "value": "application/json"
+                "key": "Authorization",
+                "value": "Bearer YOUR_ACCESS_TOKEN"
               }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"event_id\": 6,\n    \"quantity\": 2\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
             "url": {
               "raw": "http://localhost:8081/bookings",
               "protocol": "http",
@@ -443,6 +400,28 @@
               "port": "8081",
               "path": [
                 "bookings"
+              ],
+              "query": [
+                {
+                  "key": "event_id",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "size",
+                  "value": "",
+                  "disabled": true
+                }
               ]
             }
           },

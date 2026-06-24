@@ -208,21 +208,30 @@ func (r *Repo) CancelBookings(ctx context.Context, bookingIds []uint64) ([]entit
 	return cancelled, nil
 }
 
-// GetStats trả về tổng vé đã bán và doanh thu ước tính (từ booking CONFIRMED) của 1 event.
-func (r *Repo) GetStats(ctx context.Context, eventId uint64) (*entity.Entity, error) {
-	var result entity.Entity
-	err := r.WithContext(ctx).
-		Model(&entity.Entity{}).
+// GetStats trả về thống kê vé đã bán và doanh thu (chỉ từ booking CONFIRMED).
+// eventId = 0: tất cả event chưa xoá; eventId > 0: lọc theo 1 event.
+func (r *Repo) GetStats(ctx context.Context, eventId uint64) ([]entity.Entity, error) {
+	query := r.WithContext(ctx).
+		Table("event e").
 		Select(`
-			e.sold_tickets                                       AS tickets_sold,
-			COALESCE(SUM(booking.quantity), 0) * e.ticket_price AS estimated_revenue
+			e.id AS event_id,
+			COALESCE(SUM(b.quantity), 0) AS tickets_sold,
+			COALESCE(SUM(b.quantity), 0) * e.ticket_price AS estimated_revenue
 		`).
-		Joins("JOIN event e ON e.id = booking.event_id").
-		Where("booking.event_id = ? AND booking.status = ?", eventId, constant.BOOKING_STATUS_CONFIRMED).
-		Group("e.id, e.sold_tickets, e.ticket_price").
-		Scan(&result).Error
+		Joins("LEFT JOIN booking b ON b.event_id = e.id AND b.status = ?", constant.BOOKING_STATUS_CONFIRMED).
+		Where("e.status = ?", constant.EVENT_STATUS_ACTIVE)
+
+	if eventId > 0 {
+		query = query.Where("e.id = ?", eventId)
+	}
+
+	var results []entity.Entity
+	err := query.
+		Group("e.id, e.ticket_price").
+		Order("e.id ASC").
+		Scan(&results).Error
 	if err != nil {
 		return nil, err
 	}
-	return &result, nil
+	return results, nil
 }
